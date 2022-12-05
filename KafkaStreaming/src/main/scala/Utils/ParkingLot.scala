@@ -44,15 +44,16 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
     println(s"   slot id   |   available   |                 vehicle                 |      Time      ")
 
     slots.foreach((slot) => {
-        val now = DateTime.now().toString()
+
+
         var diff = "0 seconds"
+
+        // calculate the last time and current time distance to print out the report
         if (slot.vehicle != null){
-          if (slot.time == "" || slot.time == "0s") {
-            slot.time = DateTime.now().toString()
-          }
           diff = TimeDistanceString(slot.time, mess.timestamp)
         }
 
+        //print out the report
         val vehicleName = if (slot.vehicle != null) slot.vehicle.model + slot.vehicle.model + slot.vehicle.color else null
 
         println(s"      ${slot.slot_id}           ${slot.vehicle == null}           ${vehicleName}         ${diff}   ")
@@ -63,6 +64,7 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
 
 
   override def AddSlot(newSlot : SLot): Unit = {
+      // in case we want more slots =>  add slot and update related fields
       slots = slots :+ newSlot
       total += 1
       available = slots.count((slot) => {slot.vehicle == null})
@@ -71,9 +73,13 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
 
 
   override def Parked(inputSLot: SLot): Unit = {
+
     slots.foreach((slot) => {
+
+      // looking for the slot that has the parked event which has the same slot id with the one in the message
       if (slot.slot_id == inputSLot.slot_id){
 
+        // if there is no vehicle => add new vehicle to that slot
         if (slot.vehicle == null){
           slot.vehicle = inputSLot.vehicle
           slot.time = inputSLot.time
@@ -81,6 +87,8 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
           // update available
           available -= 1
         }else{
+
+          // if there is a new vehicle => update ID
           slot.vehicle.id = inputSLot.vehicle.id
         }
         println(slot.vehicle)
@@ -92,17 +100,20 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
   override def Exit(inputSLot: SLot): Unit = {
     slots.foreach((slot) => {
 
+      // looking for the slot that is effected by this event which has the same id with the slot in the message
       if (slot.vehicle!= null && slot.vehicle.id == inputSLot.vehicle.id) {
 
-        // calculate if the time is valid
+        // calculate if the time is valid because of outside factors such as human, cars ..
+        // it's required more than 5s to exit a parking slot
         val TimeDiff = TimeDistanceInMillis(old_time = slot.time, current_time = inputSLot.time )
-        if (TimeUnit.MILLISECONDS.toSeconds(TimeDiff) > 5){
+        if (TimeUnit.MILLISECONDS.toSeconds(TimeDiff) > 7){
           slot.vehicle = null
           slot.time = ""
           // update available
           available -= 1
 
         }else {
+          // else just update the object id.
           slot.vehicle.id = inputSLot.vehicle.id
         }
 
