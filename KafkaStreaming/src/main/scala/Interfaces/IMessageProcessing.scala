@@ -1,6 +1,6 @@
 package Interfaces
 
-import Utils.DomainObject.Messages
+import DomainObjects.MessageObject.Messages
 
 trait IMessageProcessing {
 

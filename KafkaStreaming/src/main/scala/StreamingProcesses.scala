@@ -1,15 +1,16 @@
 
 import Interfaces.IStreaming
-import Utils.Config
-import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord, KafkaConsumer}
+import DomainObjects.Config
+import DomainObjects.ParkingLotObject.{ParkedVehicle, SLot}
+import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.common.serialization._
 
 import java.time.Duration
 import java.util.Properties
 import scala.jdk.CollectionConverters._
-import Utils._
-import _root_.Utils.DomainObject._
-
+import DomainObjects._
+import DomainObjects.MessageObject._
+import Utils.{MessageProcessing, ParkingLot}
 
 
 
@@ -45,7 +46,6 @@ class StreamingProcesses(
 
 
 
-
   // start listen and consuming from object.
   override def Start(): Unit = {
 
@@ -63,16 +63,23 @@ class StreamingProcesses(
 
       if (!pollRecords.isEmpty) {
 
-        println(s"Polled ${pollRecords.count()} records")
-
         val recordIterator = pollRecords.iterator()
 
         while (recordIterator.hasNext) {
-
+          // get record from streaming info
           val record = recordIterator.next()
+
+          // preprocessing and deserialize
           var messOb = messageProcessing.StringToObjectDeserializer(record.value())
+
+
+          println("Event: " + messOb.event._type)
+
+          // tracking object, event and slot
           ObjectAndSlotTracking(messOb)
-          parkingLotObject.Report()
+
+          // report real-time parking lot info
+          parkingLotObject.Report(messOb)
 
         }
       }
@@ -82,8 +89,41 @@ class StreamingProcesses(
 
   override def ObjectAndSlotTracking(mess: Messages): Unit = {
 
+    // get Objects from message
+    val detectedObject = mess.detected_object
+    var parked_slot = detectedObject.coordinate.z.asInstanceOf[Int]
+    var vehicle = detectedObject.vehicle
 
+    // create a vehicle object in the parked slot
+    var parkedVehicle = new ParkedVehicle(
+      id = detectedObject.id,
+      _type = vehicle._type,
+      make = vehicle.make,
+      model = vehicle.model,
+      color = vehicle.color,
+      licenseState = vehicle.licenseState,
+      license = vehicle.license,
+      confidence = vehicle.confidence
+    )
+
+    // create a slot for
+    val newSlot = new SLot(
+      slot_id = parked_slot,
+      time = mess.timestamp,
+      vehicle = parkedVehicle
+    )
+
+    //
     if (mess.event._type == StreamingEvent.parked){
+
+      // update slot stage
+      parkingLotObject.Parked(newSlot)
+
+    }
+    else if (mess.event._type == StreamingEvent.exit){
+
+      // Update
+      parkingLotObject.Exit(newSlot)
 
     }
 

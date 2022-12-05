@@ -1,16 +1,17 @@
-import Utils.{Config, DomainObject}
-import Utils.DomainObject.{ParkingLot, ParkingSpot, SLot}
+import DomainObjects.Config
+import Utils.{MessageProcessing, ParkingLot}
 
 
 object Main extends App{
 
-  val config = Config(boostrap_server = "192.168.10.235:9092", topic = "cs411_bigdata")
-  val parkingLotObject = new ParkingLot ()
-  parkingLotObject.id = "1"
-  parkingLotObject.slots = new List[DomainObject.SLot] {new SLot(slot_id = "1", uptime = "0s", vehicle = null)}
-  parkingLotObject
 
-  val streaming = new StreamingProcesses(config)
+  val config = Config(boostrap_server = "localhost:9092", topic = "cs411_bigdata")
+
+  val parkingLotObject = new ParkingLot (id = 1 , n_slots = 4, input_location = null)
+
+  val messageProcessing = new MessageProcessing()
+
+  val streaming = new StreamingProcesses(config, parkingLotObject = parkingLotObject, messageProcessing = messageProcessing)
 
   streaming.Start()
 

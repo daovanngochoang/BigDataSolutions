@@ -1,10 +1,9 @@
 package Utils
 
+import DomainObjects.MessageObject.Messages
 import Interfaces.IMessageProcessing
-import Utils.DomainObject.Messages
 import io.circe.generic.auto._
 import io.circe.parser._
-import io.circe.syntax._
 
 
 class MessageProcessing extends IMessageProcessing{

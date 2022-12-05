@@ -1,13 +1,19 @@
 package Interfaces
 
-import Utils.DomainObject._
+import DomainObjects.MessageObject._
+import DomainObjects.ParkingLotObject.SLot
 
 trait IParkingLot {
 
   def ConstructParkingLot () : Unit
 
   // report the parking
-  def Report(): Unit
+  def Report(mess: Messages): Unit
 
-  def AddSlot() : Unit
+  def AddSlot(newSlot : SLot) : Unit
+
+  def Parked (SLot: SLot) : Unit
+
+  def Exit (inputSLot: SLot): Unit
+
 }
