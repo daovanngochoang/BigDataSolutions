@@ -17,9 +17,7 @@ trait IParkingLot {
   // handle Exit event
   def Exit (inputSLot: SLot): Unit
 
-  def OtherAction (mssEvent: String, inputSlot : SLot) : Unit
-
-
+  // tracking vehicle stage, action to make sure they have the prosper id in the detected model
   def VehicleTracking (newVehicle: ParkingLotVehicle) : Unit
 
 

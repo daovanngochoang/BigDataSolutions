@@ -114,7 +114,7 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
   }
 
   override def OtherAction(mssEvent: String, inputSlot: SLot): Unit = {}
-  
+
   override def VehicleTracking(newVehicle : ParkingLotVehicle): Unit = {}
 
 }
