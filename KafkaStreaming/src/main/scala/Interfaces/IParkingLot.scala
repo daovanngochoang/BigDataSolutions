@@ -1,12 +1,9 @@
 package Interfaces
 
 import DomainObjects.MessageObject._
-import DomainObjects.ParkingLotObject.SLot
+import DomainObjects.ParkingLotObject.{ParkingLotVehicle, SLot}
 
 trait IParkingLot {
-
-  // Construct a parking lot object
-  def ConstructParkingLot () : Unit
 
   // report the parking
   def Report(mess: Messages): Unit
@@ -19,5 +16,11 @@ trait IParkingLot {
 
   // handle Exit event
   def Exit (inputSLot: SLot): Unit
+
+  def OtherAction (mssEvent: String, inputSlot : SLot) : Unit
+
+
+  def VehicleTracking (newVehicle: ParkingLotVehicle) : Unit
+
 
 }

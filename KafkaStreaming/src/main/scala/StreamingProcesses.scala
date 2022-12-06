@@ -1,7 +1,7 @@
 
 import Interfaces.IStreaming
 import DomainObjects.Config
-import DomainObjects.ParkingLotObject.{ParkedVehicle, SLot}
+import DomainObjects.ParkingLotObject.{ParkingLotVehicle, SLot, StreamingEvent}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.common.serialization._
 
@@ -22,13 +22,6 @@ class StreamingProcesses(
                         ) extends IStreaming{
 
 
-
-  object StreamingEvent {
-    val parked = "parked"
-    val exit = "exit"
-    val entry = "entry"
-    val moving = "moving"
-  }
 
 
   override def ConstructConfig(): Properties = {
@@ -71,7 +64,7 @@ class StreamingProcesses(
 
           // preprocessing and deserialize
           var messOb = messageProcessing.StringToObjectDeserializer(record.value())
-
+          println(messOb.detected_object)
 
           println("Event: " + messOb.event._type)
 
@@ -95,7 +88,7 @@ class StreamingProcesses(
     var vehicle = detectedObject.vehicle
 
     // create a vehicle object in the parked slot
-    var parkedVehicle = new ParkedVehicle(
+    var parkedVehicle = new ParkingLotVehicle(
       id = detectedObject.id,
       _type = vehicle._type,
       make = vehicle.make,
@@ -103,7 +96,8 @@ class StreamingProcesses(
       color = vehicle.color,
       licenseState = vehicle.licenseState,
       license = vehicle.license,
-      confidence = vehicle.confidence
+      confidence = vehicle.confidence,
+      last_action = mess.event._type
     )
 
     // create a slot for
@@ -125,6 +119,7 @@ class StreamingProcesses(
       // Update
       parkingLotObject.Exit(newSlot)
 
+    }else {
     }
 
   }
