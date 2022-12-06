@@ -1,5 +1,5 @@
 
-import Interfaces.IStreaming
+import Interfaces.{IMessageProcessing, IParkingLot, IStreaming}
 import DomainObjects.Config
 import DomainObjects.ParkingLotObject.{ParkingLotVehicle, SLot, StreamingEvent}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
@@ -17,8 +17,8 @@ import Utils.{MessageProcessing, ParkingLot}
 
 class StreamingProcesses(
                           config: Config,
-                          parkingLotObject: ParkingLot,
-                          messageProcessing: MessageProcessing
+                          parkingLotObject: IParkingLot,
+                          messageProcessing: IMessageProcessing
                         ) extends IStreaming{
 
 

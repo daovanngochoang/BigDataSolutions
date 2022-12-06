@@ -37,6 +37,7 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
 
     println(s"Report for the ParkingLot id = ${id}")
     println(s"Available: ${available}/${total}")
+    println("Busy slots: ")
     println(s"   slot id   |   available   |           vehicle          |      Time      ")
 
 
@@ -46,10 +47,11 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
         // calculate the last time and current time distance to print out the report
         if (slot.vehicle != null) {
           diff = TimeDistanceString(slot.time, mess.timestamp)
+          //print out the report
+          val vehicleName = if (slot.vehicle != null) s"${slot.vehicle._type} ${slot.vehicle.make} ${slot.vehicle.color} ${slot.vehicle.licenseState}" else null
+          println(s"      ${slot.slot_id}           ${slot.vehicle == null}           ${vehicleName}         ${diff}   ")
+
         }
-        //print out the report
-        val vehicleName = if (slot.vehicle != null) s"${slot.vehicle._type} ${slot.vehicle.make} ${slot.vehicle.color} ${slot.vehicle.licenseState}"  else null
-        println(s"      ${slot.slot_id}           ${slot.vehicle == null}           ${vehicleName}         ${diff}   ")
 
     }})
     println("\n\n")
@@ -113,7 +115,6 @@ class ParkingLot (id : Int, n_slots : Int, input_location: Location) extends IPa
     }
   }
 
-  override def OtherAction(mssEvent: String, inputSlot: SLot): Unit = {}
 
   override def VehicleTracking(newVehicle : ParkingLotVehicle): Unit = {}
 
